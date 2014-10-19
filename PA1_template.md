@@ -22,8 +22,8 @@ names(totalSteps) <- c("date", "totalSteps")
 ###Calculating the mean total number of steps per day
 
 Part one of the assignment
-- Make a histogram of the total number of steps 
-- Calculate the mean and median of the total number of steps per day
+1. Make a histogram of the total number of steps 
+2. Calculate the mean and median of the total number of steps per day - The median is *10765* and the mean is *10766*. See code below. The summary() functions reports both mean and median. 
 
 
 
@@ -51,14 +51,12 @@ summary(totalSteps)
 ##  2012-10-06: 1   Max.   :21194  
 ##  (Other)   :55   NA's   :8
 ```
-
-```r
-#gives you values for mean and median
-```
+ 
 
 ###What is the average daily activity pattern? 
 
-Reaggregate the data using the reshape package to summarize the data by interval and plot with the ggplot package because it makes prettier plots than base R.. 
+Reaggregate the data using the reshape package to summarize the data by interval and plot with the ggplot package because it makes prettier plots than base R. 
+1. Code to generate plot time seres plot is below. 
 
 ```r
 m.act <- melt(act, measure = "steps", id = c("date", "interval"), na.rm = TRUE)
@@ -68,7 +66,7 @@ ggplot(byInt, aes(x = interval, y = steps)) + geom_line()
 
 ![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3.png) 
 
-The interval in which steps has the max value of 206.1698 is at 835. The code below finds the max values and then displays the row containing the max value of steps. 
+2. The interval in which steps has the max value of **206.1698** is at **835**. The code below finds the max values and then displays the row containing the max value of steps. 
 
 
 ```r
@@ -83,7 +81,7 @@ byInt[maxId,]
 
 ###Imputing missing values 
 
-1. There are 2304 missing values, as caluclated below.
+1. There are **2304 missing values**, as caluclated below.
 
 ```r
 nas = act$steps[is.na(act$steps)]
@@ -134,21 +132,24 @@ summary(totalSteps2)
 ##  (Other)   :55
 ```
 
-If you comapre mean and median before and after imputing missing values, only the median changed, and only by 1. 
+If you comapre mean and median before and after imputing missing values, **only the median changed, and only by 1**. 
 
 ###Comparing Weekdays to weekends 
-1. New variable for weekday vs. weekend is called wkOrwkend
+1. New variable for weekday vs. weekend is called wkOrwkend, and I used an ifelse statement to determine if a day fell on a weekday or weekend.
+
 
 ```r
 act2$date <- as.Date(act2$date)
 act2$day = weekdays(act2$date)
 act2$wkOrwkend = ifelse(!(act2$day %in% c("Saturday", "Sunday")), "weekday", "weekend")
 ```
-2. Plot, using ggplot 
+2. Plot, using ggplot, using same reshape strategy as above to average accross time intervals. 
 
 
 ```r
-ggplot(act2, aes(x= interval, y= steps )) + geom_line() + facet_grid(~wkOrwkend)
+m.act2 <- melt(act2, measure = "steps", id = c("date", "interval", "wkOrwkend"), na.rm = TRUE)
+byInt2 <- dcast(m.act2, interval + wkOrwkend ~ variable, fun = mean)
+ggplot(byInt2, aes(x= interval, y= steps )) + geom_line() + facet_grid(~wkOrwkend)
 ```
 
 ![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9.png) 
